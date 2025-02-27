@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debt Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .dashboard {
+            width: 80%;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .summary {
+            display: flex;
+            justify-content: space-between;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input, select, button {
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .debt-status {
+            padding: 5px;
+            border-radius: 5px;
+            color: white;
+        }
+
+        .paid {
+            background-color: #4CAF50;
+        }
+
+        .pending {
+            background-color: #FF6347;
+        }
+
+        .action-btn {
+            padding: 5px 10px;
+            margin: 2px;
+            cursor: pointer;
+        }
+
+        .update-btn {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+        }
+
+        .delete-btn {
+            background-color: #f44336;
+            color: white;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard">
+        <h1>Debt Tracker</h1>
+
+        <div class="summary">
+            <p><strong>Total Debts:</strong> $<span id="totalDebts">0</span></p>
+        </div>
+
+        <div class="input-container">
+            <input type="text" id="debtName" placeholder="Debt Name">
+            <input type="number" id="debtAmount" placeholder="Amount">
+            <select id="debtStatus">
+                <option value="paid">Paid</option>
+                <option value="pending">Pending</option>
+            </select>
+            <button id="addDebtBtn">Add Debt</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Debt Name</th>
+                    <th>Amount ($)</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="debtTable">
+                <!-- Data will be added dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+    <script >document.addEventListener("DOMContentLoaded", () => {
+        const debts = [];
+    
+        const debtNameInput = document.getElementById("debtName");
+        const debtAmountInput = document.getElementById("debtAmount");
+        const debtStatusInput = document.getElementById("debtStatus");
+        const addDebtBtn = document.getElementById("addDebtBtn");
+        const debtTable = document.getElementById("debtTable");
+        const totalDebtsDisplay = document.getElementById("totalDebts");
+    
+        function addDebt() {
+            const name = debtNameInput.value.trim();
+            const amount = Number(debtAmountInput.value);
+            const status = debtStatusInput.value.toLowerCase();
+    
+            if (!name || amount <= 0 || (status !== "paid" && status !== "pending")) {
+                alert("Please enter valid details (status must be 'paid' or 'pending').");
+                return;
+            }
+    
+            const debt = { name, amount, status };
+            debts.push(debt);
+            updateDashboard(debt);
+            debtNameInput.value = "";
+            debtAmountInput.value = "";
+        }
+    
+        function deleteDebt(row, index) {
+            debts.splice(index, 1);
+            debtTable.removeChild(row);
+            updateTotalDebt();
+        }
+    
+        function updateDebt(row, index) {
+            const newName = prompt("Enter new debt name:", debts[index].name);
+            const newAmount = prompt("Enter new amount ($):", debts[index].amount);
+            const newStatus = prompt("Enter new status (paid/pending):", debts[index].status);
+    
+            if (newName && newAmount > 0 && (newStatus === "paid" || newStatus === "pending")) {
+                debts[index] = { name: newName, amount: Number(newAmount), status: newStatus };
+                row.children[0].textContent = newName;
+                row.children[1].textContent = `rupee${newAmount}`;
+                row.children[2].innerHTML = `<span class="debt-status ${newStatus}">${newStatus}</span>`;
+                updateTotalDebt();
+            } else {
+                alert("Invalid input! Please enter correct values.");
+            }
+        }
+    
+        function updateDashboard(debt) {
+            const row = document.createElement("tr");
+    
+            row.innerHTML = `
+                <td>${debt.name}</td>
+                <td>$${debt.amount}</td>
+                <td><span class="debt-status ${debt.status}">${debt.status}</span></td>
+                <td>
+                    <button class="action-btn update-btn">Update</button>
+                    <button class="action-btn delete-btn">Delete</button>
+                </td>
+            `;
+    
+            debtTable.appendChild(row);
+    
+            const index = debts.length - 1;
+    
+            row.querySelector(".update-btn").addEventListener("click", () => updateDebt(row, index));
+            row.querySelector(".delete-btn").addEventListener("click", () => deleteDebt(row, index));
+    
+            updateTotalDebt();
+        }
+    
+        function updateTotalDebt() {
+            let totalDebts = debts.reduce((sum, debt) => sum + debt.amount, 0);
+            totalDebtsDisplay.textContent = totalDebts;
+        }
+    
+        addDebtBtn.addEventListener("click", addDebt);
+    });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Income Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        .dashboard {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .income-box {
+            font-size: 24px;
+            font-weight: bold;
+            color: green;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            background: white;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    
+
+    <div class="dashboard">
+        <h2>Income Dashboard</h2>
+        <p>Total Income: <span class="income-box" id="totalIncome">rupees 0.00</span></p>
+        <h2>Date  <input id="date" type="date"></h2>
+        <h2>Source <input id= "source"type="text"></h2>
+        <h2>Amount <input id="amount"number"></h2>
+        <button id="addButton">Add Income</button>
+        <h3>Transaction History</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Source</th>
+                    <th>Amount</th>
+                    <th>Action</th>
+                     
+                </tr>
+            </thead>
+            <tbody id="incomeTable">
+              
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let totalIncome = 0;
+            const totalIncomeElement = document.getElementById("totalIncome");
+            const incomeTable = document.getElementById("incomeTable");
+            const dateInput = document.getElementById("date");
+            const sourceInput = document.getElementById("source");
+            const amountInput = document.getElementById("amount");
+            const addButton = document.getElementById("addButton");
+
+            function addIncome() {
+                const date = dateInput.value;
+                const source = sourceInput.value;
+                const amount = amountInput.value;
+
+                if (!date || !source || !amount) {
+                    alert("Please fill all fields.");
+                    return;
+                }
+
+                const amountValue = parseFloat(amount);
+                if (isNaN(amountValue) || amountValue <= 0) {
+                    alert("Please enter a valid amount.");
+                    return;
+                }
+
+                totalIncome += amountValue;
+                totalIncomeElement.innerText = "rupees " + totalIncome.toFixed(2);
+
+                const row = document.createElement("tr");
+                row.innerHTML = `<td>${date}</td><td>${source}</td><td>${amountValue.toFixed(2)}</td>`;
+
+                const actionCell = document.createElement("td");
+
+                const updateButton = document.createElement("button");
+                updateButton.innerText = "Update";
+                updateButton.addEventListener("click", function () {
+                    updateIncome(row, amountValue);
+                });
+
+                const deleteButton = document.createElement("button");
+                deleteButton.innerText = "Delete";
+                deleteButton.addEventListener("click", function () {
+                    deleteIncome(row, amountValue);
+                });
+
+                actionCell.appendChild(updateButton);
+                actionCell.appendChild(deleteButton);
+                row.appendChild(actionCell);
+                incomeTable.appendChild(row);
+
+                // Clear input fields
+                dateInput.value = "";
+                sourceInput.value = "";
+                amountInput.value = "";
+            }
+
+            function deleteIncome(row, amount) {
+                incomeTable.removeChild(row);
+                totalIncome -= amount;
+                totalIncomeElement.innerText = "rupees " + totalIncome.toFixed(2);
+            }
+
+            function updateIncome(row, oldAmount) {
+                const cells = row.getElementsByTagName("td");
+                const newDate = prompt("Enter new date:", cells[0].innerText);
+                const newSource = prompt("Enter new source:", cells[1].innerText);
+                const newAmount = prompt("Enter new amount:", cells[2].innerText);
+
+                if (newDate && newSource && newAmount) {
+                    const newAmountValue = parseFloat(newAmount);
+                    if (isNaN(newAmountValue) || newAmountValue <= 0) {
+                        alert("Invalid amount entered.");
+                        return;
+                    }
+                    totalIncome = totalIncome - oldAmount + newAmountValue;
+                    totalIncomeElement.innerText = "rupees " + totalIncome.toFixed(2);
+
+                    cells[0].innerText = newDate;
+                    cells[1].innerText = newSource;
+                    cells[2].innerText = newAmountValue.toFixed(2);
+                }
+            }
+
+            addButton.addEventListener("click", addIncome);
+        });
+    </script>
+  
+
+</body>
+</html>
+

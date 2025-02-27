@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; padding: 20px; }
+        .container { max-width: 800px; margin: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #a44343; padding: 8px; text-align: left; }
+        th { background-color: #8d6565; }
+        canvas { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Expense Dashboard</h2>
+        <p>TotalExpenseAmount: <span class="income-box" id="totalExpenceAmount">rupees 0.00</span></p>
+        <label >Date: <input type="date" id="date"></label>
+        <label>Expense Name: <input type="text" id="expenseName"></label>
+        <label>Amount: <input type="number" id="Amount"></label>
+        
+        <button id="addButton">AddExpense</button>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Name</th>
+                    <th>Amount</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="expenseTable"></tbody>
+        </table>
+        
+        <canvas id="expenseChart"></canvas>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let TotalExpenceAmount = 0;
+            const totalExpenceAmount = document.getElementById("totalExpenceAmount");
+            const dateInput = document.getElementById("date");
+            const nameInput = document.getElementById("expenseName");
+            const amountInput = document.getElementById("Amount");
+            const addButton = document.getElementById("addButton");
+            const expenseTable = document.getElementById("expenseTable");
+
+            function AddExpense() {
+                const date = dateInput.value;
+                const name = nameInput.value;
+                const amount = amountInput.value;
+
+                if (!date || !name || !amount) {
+                    alert("Please fill all fields.");
+                    return;
+                }
+
+                const amountValue = parseFloat(amount);
+                if (isNaN(amountValue) || amountValue <= 0) {
+                    alert("Please enter a valid amount.");
+                    return;
+                }
+
+                TotalExpenceAmount += amountValue;
+                totalExpenceAmount.innerText = "rupees " + TotalExpenceAmount.toFixed(2);
+
+                const row = document.createElement("tr");
+                row.innerHTML = `<td>${date}</td><td>${name}</td><td>${amountValue.toFixed(2)}</td>`;
+
+                const actionCell = document.createElement("td");
+
+                const updateButton = document.createElement("button");
+                updateButton.innerText = "Update";
+                updateButton.addEventListener("click", function () {
+                    updateExpense(row, amountValue);
+                });
+
+                const deleteButton = document.createElement("button");
+                deleteButton.innerText = "Delete";
+                deleteButton.addEventListener("click", function () {
+                    deleteExpense(row, amountValue);
+                });
+
+                actionCell.appendChild(updateButton);
+                actionCell.appendChild(deleteButton);
+                row.appendChild(actionCell);
+                expenseTable.appendChild(row);  // Corrected the table reference
+
+                // Clear input fields
+                dateInput.value = "";
+                nameInput.value = "";
+                amountInput.value = "";
+            }
+
+            function deleteExpense(row, amount) {
+                expenseTable.removeChild(row);
+                TotalExpenceAmount -= amount;
+                totalExpenceAmount.innerText = "rupees " + TotalExpenceAmount.toFixed(2);
+            }
+
+            function updateExpense(row, oldAmount) {
+                const cells = row.getElementsByTagName("td");
+                const newDate = prompt("Enter new date:", cells[0].innerText);
+                const newName = prompt("Enter new name:", cells[1].innerText);
+                const newAmount = prompt("Enter new amount:", cells[2].innerText);
+
+                if (newDate && newName && newAmount) {
+                    const newAmountValue = parseFloat(newAmount);
+                    if (isNaN(newAmountValue) || newAmountValue <= 0) {
+                        alert("Invalid amount entered.");
+                        return;
+                    }
+
+                    TotalExpenceAmount = TotalExpenceAmount - oldAmount + newAmountValue;
+                    totalExpenceAmount.innerText = "rupees " + TotalExpenceAmount.toFixed(2);
+
+                    cells[0].innerText = newDate;
+                    cells[1].innerText = newName;
+                    cells[2].innerText = newAmountValue.toFixed(2);
+                }
+            }
+
+            addButton.addEventListener("click", AddExpense);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investment Dashboard</title>
+    <link rel="stylesheet" href="investment.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="dashboard">
+        <h1>Investment Dashboard</h1>
+        
+        <label>Date: <input type="date" id="date"></label>
+        <label>Stock Name: <input type="text" id="stock-name"></label>
+        <label>Amount Invested: <input type="number" id="amount-invested"></label>
+        <label>Returns: <input type="number" id="return"></label>
+        <button id="addInvestmentBtn">Add Investment</button>
+
+        <div class="summary">
+            <p><strong>Total Investment:</strong> <span id="totalInvestment">rupe 0</span></p>
+            <p><strong>Total Returns:</strong> <span id="totalReturns">rup 0</span></p>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Stock Name</th>
+                    <th>Amount Invested</th>
+                    <th>Returns</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="investmentTable">
+                <!-- Investments will be added here -->
+            </tbody>
+        </table>
+    </div>
+ <script>
+ document.addEventListener("DOMContentLoaded", function () {
+            const dateInput = document.getElementById("date");
+            const stockNameInput = document.getElementById("stock-name");
+            const amountInvestedInput = document.getElementById("amount-invested");
+            const returnInput = document.getElementById("return");
+            const addInvestmentBtn = document.getElementById("addInvestment");
+            const investmentTable = document.getElementById("investmentTable");
+            const totalInvestmentDisplay = document.getElementById("totalInvestment");
+            const totalReturnsDisplay = document.getElementById("totalReturns");
+
+            let totalInvestment = 0;
+            let totalReturns = 0;
+
+            function addInvestment() {
+                const date = dateInput.value;
+                const stockName = stockNameInput.value.trim();
+                const amountInvested = parseFloat(amountInvestedInput.value);
+                const returns = parseFloat(returnInput.value);
+
+                if (!date || !stockName || isNaN(amountInvested) || isNaN(returns) || amountInvested <= 0) {
+                    alert("Please enter valid investment details!");
+                    return;
+                }
+
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${date}</td>
+                    <td>${stockName}</td>
+                    <td>rupe${amountInvested}</td>
+                    <td>rupe${returns}</td>
+                    <td><button class="delete-btn">Delete</button></td>
+                `;
+
+                // Append the new row to the table
+                investmentTable.appendChild(row);
+
+                // Update totals
+                totalInvestment += amountInvested;
+                totalReturns += returns;
+                totalInvestmentDisplay.textContent = totalInvestment;
+                totalReturnsDisplay.textContent = totalReturns;
+
+                // Clear input fields
+                dateInput.value = "";
+                stockNameInput.value = "";
+                amountInvestedInput.value = "";
+                returnInput.value = "";
+
+                // Add delete event listener
+                row.querySelector(".delete-btn").addEventListener("click", function () {
+                    removeInvestment(row, amountInvested, returns);
+                });
+            }
+
+            function removeInvestment(row, amountInvested, returns) {
+                // Remove row from table
+                investmentTable.removeChild(row);
+
+                // Update totals
+                totalInvestment -= amountInvested;
+                totalReturns -= returns;
+                totalInvestmentDisplay.textContent = totalInvestment;
+                totalReturnsDisplay.textContent = totalReturns;
+            }
+
+            // Event listener for adding investments
+            addInvestmentBtn.addEventListener("click", addInvestment);
+        });
+</script>
+</body>
+</html>
